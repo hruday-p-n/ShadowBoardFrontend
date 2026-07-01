@@ -1,20 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  useQuery,
   useMutation,
-  useQueryClient,
 } from "@tanstack/react-query";
 import {
   Upload,
-  FileText,
   BrainCircuit,
   LogOut,
 } from "lucide-react";
 
 import { api } from "../lib/api";
 import { useAuth } from "../store/auth";
-import type { DocumentItem } from "../types";
 
 export default function DashboardPage() {
   const [projectId] = useState(
