@@ -8,6 +8,8 @@ import {
 
 import "./index.css";
 
+import SignupPage from "./pages/SignupPage";
+import CreateProjectPage from "./pages/CreateProjectPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import DecisionPage from "./pages/DecisionPage";
@@ -20,6 +22,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          <Route path="/signup" element={<SignupPage />} />
+          <Route
+  path="/create-project"
+  element={
+    <ProtectedRoute>
+      <CreateProjectPage />
+    </ProtectedRoute>
+  }
+/>
           {/* Login */}
           <Route path="/" element={<LoginPage />} />
 
@@ -35,7 +46,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
           {/* Decision Page */}
           <Route
-            path="/decisions/:id"
+            path="/decisions/result"
             element={
               <ProtectedRoute>
                 <DecisionPage />

@@ -27,47 +27,59 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const logout = useAuth((state) => state.logout);
 
-  const queryClient = useQueryClient();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+const handleLogout = () => {
+  localStorage.removeItem("current_project_id");
+  logout();
+  navigate("/");
+};
 
-  const { data: documents } = useQuery<DocumentItem[]>({
-    queryKey: ["documents", projectId],
-    queryFn: async () =>
-      (await api.get(`/api/v1/projects/${projectId}/documents`)).data,
-    enabled: !!projectId,
-  });
+const uploadMutation = useMutation({
+  mutationFn: async () => {
+    const formData = new FormData();
 
-  const uploadMutation = useMutation({
-    mutationFn: async () => {
-      const formData = new FormData();
+    formData.append("file", file as File);
 
-      formData.append("project_id", projectId);
-      formData.append("file", file as File);
-
-      return api.post("/api/v1/documents/upload", formData, {
+    return api.post(
+      `/documents/upload/${projectId}`,
+      formData,
+      {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
-    },
+      }
+    );
+  },
 
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ["documents", projectId],
-      }),
-  });
+  onSuccess: () => {
+    alert("Document uploaded successfully.");
+    setFile(null);
+  },
 
-  const decisionMutation = useMutation({
-    mutationFn: async () =>
-      api.post("/api/v1/decisions/", {
-        project_id: projectId,
+  onError: () => {
+    alert("Failed to upload document.");
+  },
+});
+
+ const decisionMutation = useMutation({
+  mutationFn: async () =>
+    api.post("/ai/query", {
+      query: question,
+    }),
+
+  onSuccess: (response) => {
+    navigate("/decisions/result", {
+      state: {
         question,
-      }),
-  });
+        response: response.data.response,
+      },
+    });
+  },
+
+  onError: () => {
+    alert("Unable to generate a response. Please try again.");
+  },
+});
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -164,55 +176,15 @@ export default function DashboardPage() {
             </button>
 
             <div className="mt-8">
+  <h3 className="font-medium mb-3">
+    Uploaded Documents
+  </h3>
 
-              <h3 className="font-medium mb-3">
-                Uploaded Files
-              </h3>
-
-              <div className="space-y-3">
-
-                {documents?.length ? (
-                  documents.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className="flex justify-between items-center border rounded-lg p-3"
-                    >
-                      <div className="flex items-center gap-3">
-
-                        <FileText
-                          size={18}
-                          className="text-slate-500"
-                        />
-
-                        <div>
-
-                          <p className="font-medium">
-                            {doc.filename}
-                          </p>
-
-                          <p className="text-xs text-slate-500">
-                            {doc.chunk_count} chunks
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                      <span className="text-xs bg-slate-100 px-2 py-1 rounded">
-                        {doc.status}
-                      </span>
-
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-slate-500 text-sm">
-                    No documents uploaded.
-                  </p>
-                )}
-
-              </div>
-
-            </div>
+  <p className="text-slate-500 text-sm">
+    Upload a document before asking ShadowBoard AI.
+    Uploaded files are stored securely for this project.
+  </p>
+</div>
 
           </section>
 
@@ -244,19 +216,9 @@ export default function DashboardPage() {
               className="mt-5 w-full bg-slate-900 hover:bg-slate-800 text-white rounded-lg py-3 transition disabled:opacity-50"
             >
               {decisionMutation.isPending
-                ? "Submitting..."
-                : "Convene the Board"}
+                ? "Generating..."
+                : "Ask ShadowBoard AI"}
             </button>
-
-            {decisionMutation.data && (
-              <a
-                href={`/decisions/${decisionMutation.data.data.id}`}
-                className="block mt-5 text-indigo-600 hover:underline font-medium"
-              >
-                View Live Decision →
-              </a>
-            )}
-
           </section>
 
         </div>
