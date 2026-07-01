@@ -24,5 +24,5 @@ pytest-asyncio==0.25.0
 pdfplumber
 pandas
 openpyxl
-google-adk
+google-adk==2.3.0
 pydantic[email]
