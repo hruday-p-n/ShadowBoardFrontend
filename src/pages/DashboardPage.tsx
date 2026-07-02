@@ -8,19 +8,23 @@ import {
   BrainCircuit,
   LogOut,
 } from "lucide-react";
-
+import { useEffect } from "react";
 import { api } from "../lib/api";
 import { useAuth } from "../store/auth";
 
 export default function DashboardPage() {
-  const [projectId] = useState(
-    localStorage.getItem("current_project_id") || ""
-  );
+const projectId =
+  localStorage.getItem("current_project_id") || "";
 
   const [file, setFile] = useState<File | null>(null);
   const [question, setQuestion] = useState("");
 
   const navigate = useNavigate();
+  useEffect(() => {
+  if (!projectId) {
+    navigate("/projects/new");
+  }
+}, [projectId, navigate]);
   const logout = useAuth((state) => state.logout);
 
 
@@ -32,6 +36,9 @@ const handleLogout = () => {
 
 const uploadMutation = useMutation({
   mutationFn: async () => {
+    if (!projectId) {
+  throw new Error("No project selected.");
+}
     const formData = new FormData();
 
     formData.append("file", file as File);
@@ -57,11 +64,16 @@ const uploadMutation = useMutation({
   },
 });
 
- const decisionMutation = useMutation({
-  mutationFn: async () =>
-    api.post("/ai/query", {
+const decisionMutation = useMutation({
+  mutationFn: async () => {
+    if (!projectId) {
+      throw new Error("No project selected.");
+    }
+
+    return api.post("/ai/query", {
       query: question,
-    }),
+    });
+  },
 
   onSuccess: (response) => {
     navigate("/decisions/result", {
@@ -95,13 +107,22 @@ const uploadMutation = useMutation({
             </p>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition"
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
+<div className="flex items-center gap-3">
+  <button
+    onClick={() => navigate("/projects/new")}
+    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+  >
+    New Project
+  </button>
+
+  <button
+    onClick={handleLogout}
+    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800"
+  >
+    <LogOut size={18} />
+    Logout
+  </button>
+</div>
 
         </div>
       </header>

@@ -43,7 +43,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               </ProtectedRoute>
             }
           />
-
+<Route
+  path="/projects/new"
+  element={
+    <ProtectedRoute>
+      <CreateProjectPage />
+    </ProtectedRoute>
+  }
+/>
           {/* Decision Page */}
           <Route
             path="/decisions/result"
