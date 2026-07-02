@@ -54,7 +54,7 @@ export default function CreateProjectPage() {
         className="bg-white rounded-2xl shadow-lg p-10 w-full max-w-2xl"
       >
         <h1 className="text-3xl font-bold text-slate-900">
-          Create Your First Project
+          Create Your Project
         </h1>
 
         <p className="text-slate-500 mt-2 mb-8">

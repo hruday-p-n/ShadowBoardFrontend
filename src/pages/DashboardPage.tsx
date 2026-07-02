@@ -193,9 +193,6 @@ const decisionMutation = useMutation({
             </button>
 
             <div className="mt-8">
-  <h3 className="font-medium mb-3">
-    Uploaded Documents
-  </h3>
 
   <p className="text-slate-500 text-sm">
     Upload a document before asking ShadowBoard AI.
